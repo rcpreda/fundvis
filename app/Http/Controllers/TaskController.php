@@ -21,7 +21,7 @@ class TaskController extends Controller
      */
     public function create()
     {
-        //
+        return view('tasks.create');
     }
 
     /**
@@ -29,7 +29,25 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:pending,done',
+            'subtasks.*.name' => 'required|string|max:255',
+            'subtasks.*.status' => 'required|in:pending,done',
+        ]);
+
+        $task = Task::create([
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'status' => $request->input('status'),
+        ]);
+
+        if ($request->has('subtasks')) {
+            $task->subtasks()->createMany($request->input('subtasks'));
+        }
+
+        return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
 
     /**
@@ -43,24 +61,46 @@ class TaskController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Task $task)
     {
-        //
+        $task->load('subtasks');
+        return view('tasks.edit', compact('task'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Task $task)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:pending,done',
+            'subtasks.*.name' => 'required|string|max:255',
+            'subtasks.*.status' => 'required|in:pending,done',
+        ]);
+
+        $task->update([
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'status' => $request->input('status'),
+        ]);
+
+        // Replace subtasks (simple version)
+        $task->subtasks()->delete();
+        if ($request->has('subtasks')) {
+            $task->subtasks()->createMany($request->input('subtasks'));
+        }
+
+        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Task $task)
     {
-        //
+        $task->delete();
+        return redirect()->route('tasks.index')->with('success', 'Task deleted (soft).');
     }
 }
