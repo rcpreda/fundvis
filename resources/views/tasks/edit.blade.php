@@ -2,7 +2,7 @@
     <x-slot name="title">Edit Task</x-slot>
 
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit Task: {{ $task->name }}</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit Task: {{ $task->getTranslation('name', app()->getLocale()) }}</h2>
     </x-slot>
 
     <div class="max-w-3xl mx-auto mt-10 bg-white p-6 rounded shadow">
@@ -10,22 +10,26 @@
             @csrf
             @method('PUT')
 
-            <!-- Task Name -->
-            <div class="mb-4">
-                <label for="name" class="block font-medium text-sm text-gray-700">Task Name</label>
-                <input type="text" name="name" id="name" value="{{ old('name', $task->name) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-            </div>
+            <!-- Task Name Translations -->
+            @foreach ($locales as $locale)
+                <div class="mb-4">
+                    <label for="name_{{ $locale }}">Task Name ({{ strtoupper($locale) }})</label>
+                    <input type="text" name="name_{{ $locale }}" id="name_{{ $locale }}" class="block w-full mt-1" value="{{ old('name_' . $locale, $task->getTranslation('name', $locale)) }}" required>
+                </div>
+            @endforeach
 
-            <!-- Description -->
-            <div class="mb-4">
-                <label for="description" class="block font-medium text-sm text-gray-700">Description</label>
-                <textarea name="description" id="description" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{ old('description', $task->description) }}</textarea>
-            </div>
+            <!-- Description Translations -->
+            @foreach ($locales as $locale)
+                <div class="mb-4">
+                    <label for="description_{{ $locale }}">Description ({{ strtoupper($locale) }})</label>
+                    <textarea name="description_{{ $locale }}" id="description_{{ $locale }}" rows="3" class="block w-full mt-1">{{ old('description_' . $locale, $task->getTranslation('description', $locale)) }}</textarea>
+                </div>
+            @endforeach
 
             <!-- Status -->
             <div class="mb-4">
-                <label for="status" class="block font-medium text-sm text-gray-700">Status</label>
-                <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <label for="status">Status</label>
+                <select name="status" id="status" class="block w-full mt-1">
                     <option value="pending" {{ $task->status === 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="done" {{ $task->status === 'done' ? 'selected' : '' }}>Done</option>
                 </select>
@@ -33,12 +37,14 @@
 
             <!-- Subtasks -->
             <div class="mb-4">
-                <label class="block font-medium text-sm text-gray-700 mb-2">Subtasks</label>
+                <label>Subtasks</label>
                 <div id="subtasks-container">
                     @foreach($task->subtasks as $index => $subtask)
-                        <div class="flex items-center gap-4 mb-2 subtask-row">
-                            <input type="text" name="subtasks[{{ $index }}][name]" value="{{ $subtask->name }}" class="w-1/2 border-gray-300 rounded-md shadow-sm" required>
-                            <select name="subtasks[{{ $index }}][status]" class="w-1/3 border-gray-300 rounded-md shadow-sm">
+                        <div class="flex gap-4 mb-2 subtask-row">
+                            @foreach ($locales as $locale)
+                                <input type="text" name="subtasks[{{ $index }}][name_{{ $locale }}]" value="{{ $subtask->getTranslation('name', $locale) }}" placeholder="Name ({{ strtoupper($locale) }})" class="w-1/3">
+                            @endforeach
+                            <select name="subtasks[{{ $index }}][status]" class="w-1/6">
                                 <option value="pending" {{ $subtask->status === 'pending' ? 'selected' : '' }}>Pending</option>
                                 <option value="done" {{ $subtask->status === 'done' ? 'selected' : '' }}>Done</option>
                             </select>
@@ -46,13 +52,12 @@
                         </div>
                     @endforeach
                 </div>
-                <button type="button" onclick="addSubtask()" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md">Add Subtask</button>
+                <button type="button" onclick="addSubtask()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Add Subtask</button>
             </div>
 
-            <!-- Submit & Cancel -->
             <div class="flex gap-4 mt-6">
-                <button type="submit" class="bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600">Update Task</button>
-                <a href="{{ route('tasks.index') }}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100">Cancel</a>
+                <button type="submit" class="bg-yellow-500 text-white px-6 py-2 rounded hover:bg-yellow-600">Update Task</button>
+                <a href="{{ route('tasks.index') }}" class="px-6 py-2 border rounded text-gray-700 hover:bg-gray-100">Cancel</a>
             </div>
         </form>
     </div>
@@ -62,15 +67,22 @@
 
         function addSubtask() {
             const container = document.getElementById('subtasks-container');
+            let inputs = '';
+
+            @foreach ($locales as $locale)
+                inputs += `<input type="text" name="subtasks[${subtaskIndex}][name_{{ $locale }}]" placeholder="Name ({{ strtoupper($locale) }})" class="w-1/3">`;
+            @endforeach
+
             const html = `
-                <div class="flex items-center gap-4 mb-2 subtask-row">
-                    <input type="text" name="subtasks[${subtaskIndex}][name]" placeholder="Subtask name" class="w-1/2 border-gray-300 rounded-md shadow-sm" required>
-                    <select name="subtasks[${subtaskIndex}][status]" class="w-1/3 border-gray-300 rounded-md shadow-sm">
-                        <option value="pending">Pending</option>
-                        <option value="done">Done</option>
-                    </select>
-                    <button type="button" class="remove-subtask text-red-500 font-bold">✕</button>
-                </div>`;
+            <div class="flex gap-4 mb-2 subtask-row">
+                ${inputs}
+                <select name="subtasks[${subtaskIndex}][status]" class="w-1/6">
+                    <option value="pending">Pending</option>
+                    <option value="done">Done</option>
+                </select>
+                <button type="button" class="remove-subtask text-red-500 font-bold">✕</button>
+            </div>`;
+
             container.insertAdjacentHTML('beforeend', html);
             subtaskIndex++;
         }

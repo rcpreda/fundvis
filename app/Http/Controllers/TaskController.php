@@ -9,9 +9,6 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $tasks = Task::whereNull('taskable_id')
@@ -20,89 +17,86 @@ class TaskController extends Controller
         return view('tasks.index', compact('tasks'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return view('tasks.create');
+        $locales = ['en', 'fr', 'ge'];
+        return view('tasks.create', compact('locales'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(CreateTaskRequest $request)
     {
         $validated = $request->validated();
+        $locales = ['en', 'fr', 'ge'];
 
-        $task = Task::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null,
-            'status' => $validated['status'],
-            'user_id' => auth()->id(),
-        ]);
+        $task = new Task();
+        $task->status = $validated['status'];
+        $task->user_id = auth()->id();
+
+        foreach ($locales as $locale) {
+            $task->setTranslation('name', $locale, $validated['name_' . $locale] ?? null);
+            $task->setTranslation('description', $locale, $validated['description_' . $locale] ?? null);
+        }
+
+        $task->save();
 
         foreach ($validated['subtasks'] ?? [] as $subtaskData) {
-            if (!empty($subtaskData['name'])) {
-                $task->subtasks()->create([
-                    'name' => $subtaskData['name'],
-                    'status' => $subtaskData['status'] ?? 'pending',
-                    'description' => $subtaskData['description'] ?? null,
-                ]);
+            $subtask = $task->subtasks()->make([
+                'status' => $subtaskData['status'] ?? 'pending',
+            ]);
+
+            foreach ($locales as $locale) {
+                $subtask->setTranslation('name', $locale, $subtaskData['name_' . $locale] ?? null);
             }
+
+            $subtask->save();
         }
 
         return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Task $task)
     {
         $task->load('subtasks');
-        return view('tasks.edit', compact('task'));
+        $locales = ['en', 'fr', 'ge'];
+        return view('tasks.edit', compact('task', 'locales'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateTaskRequest $request, Task $task)
     {
         $validated = $request->validated();
+        $locales = ['en', 'fr', 'ge'];
 
-        $task->update([
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null,
-            'status' => $validated['status'],
-        ]);
+        $task->status = $validated['status'];
+
+        foreach ($locales as $locale) {
+            $task->setTranslation('name', $locale, $validated['name_' . $locale] ?? null);
+            $task->setTranslation('description', $locale, $validated['description_' . $locale] ?? null);
+        }
+
+        $task->save();
 
         $task->subtasks()->delete();
 
         foreach ($validated['subtasks'] ?? [] as $subtaskData) {
-            if (!empty($subtaskData['name'])) {
-                $task->subtasks()->create([
-                    'name' => $subtaskData['name'],
-                    'status' => $subtaskData['status'] ?? 'pending',
-                    'description' => $subtaskData['description'] ?? null,
-                ]);
+            $subtask = $task->subtasks()->make([
+                'status' => $subtaskData['status'] ?? 'pending',
+            ]);
+
+            foreach ($locales as $locale) {
+                $subtask->setTranslation('name', $locale, $subtaskData['name_' . $locale] ?? null);
             }
+
+            $subtask->save();
         }
 
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Task $task)
     {
         $task->delete();

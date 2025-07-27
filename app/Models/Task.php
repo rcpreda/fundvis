@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Spatie\Translatable\HasTranslations;
 
 class Task extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasTranslations;
 
     protected $fillable = [
         'name',
@@ -20,6 +21,9 @@ class Task extends Model
         'taskable_type',
         'user_id'
     ];
+
+    public $translatable = ['name', 'description'];
+
     public function taskable(): MorphTo
     {
         return $this->morphTo();

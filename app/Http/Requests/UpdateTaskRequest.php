@@ -17,7 +17,9 @@ class UpdateTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'name_en' => 'required|string|max:255',
+            'name_fr' => 'nullable|string|max:255',
+            'name_ge' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'status' => 'required|in:pending,done',
             'subtasks.*.name' => 'nullable|string|max:255',
