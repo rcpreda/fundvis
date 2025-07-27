@@ -12,7 +12,9 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::with('subtasks')->get();
+        $tasks = Task::whereNull('taskable_id')
+            ->with('subtasks')
+            ->get();
         return view('tasks.index', compact('tasks'));
     }
 

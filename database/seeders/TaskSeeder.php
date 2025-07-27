@@ -14,14 +14,14 @@ class TaskSeeder extends Seeder
     public function run(): void
     {
         $task = Task::create([
-            'name' => 'Test Task',
-            'description' => 'This is a test task used for seeding the database.',
+            'name' => 'Main Task',
+            'description' => 'Parent task',
             'status' => 'pending',
         ]);
 
         $task->subtasks()->createMany([
-            ['name' => 'First subtask', 'status' => 'pending'],
-            ['name' => 'Second subtask', 'status' => 'done'],
+            ['name' => 'Subtask 1', 'description' => 'Sutask 1', 'status' => 'pending'],
+            ['name' => 'Subtask 2', 'description' => 'Subtask 1', 'status' => 'done'],
         ]);
     }
 }
