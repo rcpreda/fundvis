@@ -1,12 +1,8 @@
 <x-app-layout>
-    <x-slot name="title">
-        Create Task
-    </x-slot>
+    <x-slot name="title">Create Task</x-slot>
 
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Create New Task
-        </h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Create New Task</h2>
     </x-slot>
 
     <div class="max-w-3xl mx-auto mt-10 bg-white p-6 rounded shadow">
@@ -15,20 +11,20 @@
 
             <!-- Task Name -->
             <div class="mb-4">
-                <label for="name" class="block font-medium text-sm text-gray-700">Task Name</label>
-                <input type="text" name="name" id="name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                <label for="name">Task Name</label>
+                <input type="text" name="name" id="name" class="block w-full mt-1" required>
             </div>
 
             <!-- Description -->
             <div class="mb-4">
-                <label for="description" class="block font-medium text-sm text-gray-700">Description</label>
-                <textarea name="description" id="description" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                <label for="description">Description</label>
+                <textarea name="description" id="description" rows="4" class="block w-full mt-1"></textarea>
             </div>
 
             <!-- Status -->
             <div class="mb-4">
-                <label for="status" class="block font-medium text-sm text-gray-700">Status</label>
-                <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <label for="status">Status</label>
+                <select name="status" id="status" class="block w-full mt-1">
                     <option value="pending">Pending</option>
                     <option value="done">Done</option>
                 </select>
@@ -36,28 +32,23 @@
 
             <!-- Subtasks -->
             <div class="mb-4">
-                <label class="block font-medium text-sm text-gray-700 mb-2">Subtasks</label>
+                <label>Subtasks</label>
                 <div id="subtasks-container">
-                    <div class="flex items-center gap-4 mb-2 subtask-row">
-                        <input type="text" name="subtasks[0][name]" placeholder="Subtask name" class="w-1/2 border-gray-300 rounded-md shadow-sm">
-                        <select name="subtasks[0][status]" class="w-1/3 border-gray-300 rounded-md shadow-sm">
+                    <div class="flex gap-4 mb-2 subtask-row">
+                        <input type="text" name="subtasks[0][name]" placeholder="Subtask name" class="w-1/2" required>
+                        <select name="subtasks[0][status]" class="w-1/3">
                             <option value="pending">Pending</option>
                             <option value="done">Done</option>
                         </select>
                         <button type="button" class="remove-subtask text-red-500 font-bold">✕</button>
                     </div>
                 </div>
-                <button type="button" onclick="addSubtask()" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md">Add Subtask</button>
+                <button type="button" onclick="addSubtask()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Add Subtask</button>
             </div>
 
-            <!-- Submit -->
-            <div>
-                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700">Save Task</button>
-
-                <a href="{{ route('tasks.index') }}"
-                   class="inline-block px-6 py-2 border border-gray-400 text-gray-700 rounded-md hover:bg-gray-100">
-                    Cancel
-                </a>
+            <div class="flex gap-4 mt-6">
+                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Save Task</button>
+                <a href="{{ route('tasks.index') }}" class="px-6 py-2 border rounded text-gray-700 hover:bg-gray-100">Cancel</a>
             </div>
         </form>
     </div>
@@ -68,9 +59,9 @@
         function addSubtask() {
             const container = document.getElementById('subtasks-container');
             const html = `
-            <div class="flex items-center gap-4 mb-2 subtask-row">
-                <input type="text" name="subtasks[${subtaskIndex}][name]" placeholder="Subtask name" class="w-1/2 border-gray-300 rounded-md shadow-sm">
-                <select name="subtasks[${subtaskIndex}][status]" class="w-1/3 border-gray-300 rounded-md shadow-sm">
+            <div class="flex gap-4 mb-2 subtask-row">
+                <input type="text" name="subtasks[${subtaskIndex}][name]" placeholder="Subtask name" class="w-1/2">
+                <select name="subtasks[${subtaskIndex}][status]" class="w-1/3">
                     <option value="pending">Pending</option>
                     <option value="done">Done</option>
                 </select>

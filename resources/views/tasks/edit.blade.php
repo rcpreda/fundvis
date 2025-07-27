@@ -1,16 +1,12 @@
 <x-app-layout>
-    <x-slot name="title">
-        Edit Task
-    </x-slot>
+    <x-slot name="title">Edit Task</x-slot>
 
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Edit Task: {{ $task->name }}
-        </h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit Task: {{ $task->name }}</h2>
     </x-slot>
 
     <div class="max-w-3xl mx-auto mt-10 bg-white p-6 rounded shadow">
-        <form action="{{ route('tasks.update', $task->id) }}" method="POST">
+        <form action="{{ route('tasks.update', $task) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -53,14 +49,10 @@
                 <button type="button" onclick="addSubtask()" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md">Add Subtask</button>
             </div>
 
-            <!-- Submit -->
-            <div>
+            <!-- Submit & Cancel -->
+            <div class="flex gap-4 mt-6">
                 <button type="submit" class="bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600">Update Task</button>
-
-                <a href="{{ route('tasks.index') }}"
-                   class="inline-block px-6 py-2 border border-gray-400 text-gray-700 rounded-md hover:bg-gray-100">
-                    Cancel
-                </a>
+                <a href="{{ route('tasks.index') }}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100">Cancel</a>
             </div>
         </form>
     </div>

@@ -46,7 +46,15 @@ class TaskController extends Controller
         ]);
 
         if ($request->has('subtasks')) {
-            $task->subtasks()->createMany($request->input('subtasks'));
+            foreach ($request->input('subtasks', []) as $subtaskData) {
+                if (!empty($subtaskData['name'])) {
+                    $task->subtasks()->create([
+                        'name' => $subtaskData['name'],
+                        'status' => $subtaskData['status'] ?? 'pending',
+                        'description' => $subtaskData['description'] ?? null,
+                    ]);
+                }
+            }
         }
 
         return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
@@ -88,10 +96,17 @@ class TaskController extends Controller
             'status' => $request->input('status'),
         ]);
 
-        // Replace subtasks (simple version)
         $task->subtasks()->delete();
         if ($request->has('subtasks')) {
-            $task->subtasks()->createMany($request->input('subtasks'));
+            foreach ($request->input('subtasks', []) as $subtaskData) {
+                if (!empty($subtaskData['name'])) {
+                    $task->subtasks()->create([
+                        'name' => $subtaskData['name'],
+                        'status' => $subtaskData['status'] ?? 'pending',
+                        'description' => $subtaskData['description'] ?? null,
+                    ]);
+                }
+            }
         }
 
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
