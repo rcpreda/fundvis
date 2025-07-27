@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use Illuminate\Http\Request;
 
@@ -29,31 +31,23 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateTaskRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|in:pending,done',
-            'subtasks.*.name' => 'required|string|max:255',
-            'subtasks.*.status' => 'required|in:pending,done',
-        ]);
+        $validated = $request->validated();
 
         $task = Task::create([
-            'name' => $request->input('name'),
-            'description' => $request->input('description'),
-            'status' => $request->input('status'),
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'status' => $validated['status'],
         ]);
 
-        if ($request->has('subtasks')) {
-            foreach ($request->input('subtasks', []) as $subtaskData) {
-                if (!empty($subtaskData['name'])) {
-                    $task->subtasks()->create([
-                        'name' => $subtaskData['name'],
-                        'status' => $subtaskData['status'] ?? 'pending',
-                        'description' => $subtaskData['description'] ?? null,
-                    ]);
-                }
+        foreach ($validated['subtasks'] ?? [] as $subtaskData) {
+            if (!empty($subtaskData['name'])) {
+                $task->subtasks()->create([
+                    'name' => $subtaskData['name'],
+                    'status' => $subtaskData['status'] ?? 'pending',
+                    'description' => $subtaskData['description'] ?? null,
+                ]);
             }
         }
 
@@ -80,32 +74,25 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Task $task)
+    public function update(UpdateTaskRequest $request, Task $task)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|in:pending,done',
-            'subtasks.*.name' => 'required|string|max:255',
-            'subtasks.*.status' => 'required|in:pending,done',
-        ]);
+        $validated = $request->validated();
 
         $task->update([
-            'name' => $request->input('name'),
-            'description' => $request->input('description'),
-            'status' => $request->input('status'),
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'status' => $validated['status'],
         ]);
 
         $task->subtasks()->delete();
-        if ($request->has('subtasks')) {
-            foreach ($request->input('subtasks', []) as $subtaskData) {
-                if (!empty($subtaskData['name'])) {
-                    $task->subtasks()->create([
-                        'name' => $subtaskData['name'],
-                        'status' => $subtaskData['status'] ?? 'pending',
-                        'description' => $subtaskData['description'] ?? null,
-                    ]);
-                }
+
+        foreach ($validated['subtasks'] ?? [] as $subtaskData) {
+            if (!empty($subtaskData['name'])) {
+                $task->subtasks()->create([
+                    'name' => $subtaskData['name'],
+                    'status' => $subtaskData['status'] ?? 'pending',
+                    'description' => $subtaskData['description'] ?? null,
+                ]);
             }
         }
 
