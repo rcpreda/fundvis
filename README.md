@@ -9,7 +9,7 @@ A small Laravel-based task management system that supports:
 - Authorization policies per user/tasks 
 - Soft deletes
 - Translatable fields via [spatie/laravel-translatable](https://github.com/spatie/laravel-translatable)
-
+- Development time: 2h
 
 ## Install guide and usage
  - git clone git@github.com:rcpreda/fundvis.git
