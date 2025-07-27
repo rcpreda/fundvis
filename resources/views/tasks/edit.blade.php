@@ -56,6 +56,11 @@
             <!-- Submit -->
             <div>
                 <button type="submit" class="bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600">Update Task</button>
+
+                <a href="{{ route('tasks.index') }}"
+                   class="inline-block px-6 py-2 border border-gray-400 text-gray-700 rounded-md hover:bg-gray-100">
+                    Cancel
+                </a>
             </div>
         </form>
     </div>
