@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Task;
 
 class CreateTaskRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class CreateTaskRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return auth()->check() && auth()->user()->can('create', Task::class);
     }
 
     public function rules(): array
@@ -24,5 +26,10 @@ class CreateTaskRequest extends FormRequest
             'subtasks.*.status' => 'nullable|in:pending,done',
             'subtasks.*.description' => 'nullable|string',
         ];
+    }
+
+    protected function failedAuthorization()
+    {
+        throw new AuthorizationException('You are not authorized to create tasks.');
     }
 }
