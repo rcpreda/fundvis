@@ -17,7 +17,8 @@ class Task extends Model
         'description',
         'status',
         'taskable_id',
-        'taskable_type'
+        'taskable_type',
+        'user_id'
     ];
     public function taskable(): MorphTo
     {
@@ -27,5 +28,10 @@ class Task extends Model
     public function subtasks(): MorphMany
     {
         return $this->morphMany(Task::class, 'taskable');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

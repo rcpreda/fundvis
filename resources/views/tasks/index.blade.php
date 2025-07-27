@@ -30,14 +30,17 @@
                     @endif
 
                     <div class="mt-3 flex gap-4 text-sm">
-                        <a href="{{ route('tasks.edit', $task) }}" class="text-blue-600 hover:underline">Edit</a>
+                        @can('update', $task)
+                            <a href="{{ route('tasks.edit', $task) }}" class="text-blue-600 hover:underline">Edit</a>
+                        @endcan
 
-                        <form action="{{ route('tasks.destroy', $task) }}" method="POST"
-                              onsubmit="return confirm('Are you sure?')" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                        </form>
+                        @can('delete', $task)
+                            <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                            </form>
+                        @endcan
                     </div>
                 </div>
             @empty

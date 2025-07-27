@@ -39,6 +39,7 @@ class TaskController extends Controller
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'status' => $validated['status'],
+            'user_id' => auth()->id(),
         ]);
 
         foreach ($validated['subtasks'] ?? [] as $subtaskData) {
